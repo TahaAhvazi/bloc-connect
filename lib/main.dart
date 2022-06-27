@@ -19,9 +19,7 @@ class MyApp extends StatelessWidget {
           create: (context) => ColorBloc(),
         ),
         BlocProvider(
-          create: (context) => CounterBloc(
-            colorBloc: context.read<ColorBloc>(),
-          ),
+          create: (context) => CounterBloc(),
         ),
       ],
       child: MaterialApp(
@@ -52,45 +50,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int incrementSize = 1;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.watch<ColorBloc>().state.color,
-      appBar: AppBar(
-        title: const Text("Cubit Commuinication"),
+    return BlocListener<ColorBloc, ColorState>(
+      listener: (context, state) {
+        if (state.color == Colors.red) {
+          incrementSize = 1;
+        } else if (state.color == Colors.green) {
+          incrementSize = 10;
+        } else if (state.color == Colors.blue) {
+          incrementSize = 100;
+        } else if (state.color == Colors.black) {
+          incrementSize = -100;
+        }
+      },
+      child: Scaffold(
         backgroundColor: context.watch<ColorBloc>().state.color,
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                context.read<ColorBloc>().add(
-                      ChangeColorEvent(),
-                    );
-              },
-              child: const Text("Change Color !"),
-            ),
-            const SizedBox(
-              height: 22.0,
-            ),
-            Text(
-              '${context.watch<CounterBloc>().state.counter}',
-            ),
-            const SizedBox(
-              height: 22.0,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                context.read<CounterBloc>().add(ChangeCounterEvent());
-              },
-              child: const Text(
-                "Increment the value!",
+        appBar: AppBar(
+          title: const Text("Cubit Commuinication"),
+          backgroundColor: context.watch<ColorBloc>().state.color,
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  context.read<ColorBloc>().add(
+                        ChangeColorEvent(),
+                      );
+                },
+                child: const Text("Change Color !"),
               ),
-            ),
-          ],
+              const SizedBox(
+                height: 22.0,
+              ),
+              Text(
+                '${context.watch<CounterBloc>().state.counter}',
+              ),
+              const SizedBox(
+                height: 22.0,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  context
+                      .read<CounterBloc>()
+                      .add(ChangeCounterEvent(incrementSize: incrementSize));
+                },
+                child: const Text(
+                  "Increment the value!",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
